@@ -21,6 +21,7 @@ exports.init = function() {
             db.run("INSERT INTO version(version) VALUES (1)");
 
             db.run("CREATE TABLE entries (id INTEGER PRIMARY KEY NOT NULL, " +
+              "email TEXT NOT NULL DEFAULT '', " +
               "text TEXT NOT NULL DEFAULT '', " +
               "text_rendered TEXT NOT NULL DEFAULT '', " +
               "date INTEGER NOT NULL" +
