@@ -1,0 +1,22 @@
+{
+    "version": "0.1",
+    "name": "microBEZilla",
+    "description": "Experimental micro-blogging service to discuss Firefox and related things. You can read more here https://github.com/daliusd/microbezilla.",
+    "launch_path": "/",
+    "icons": {
+        "16": "/images/icon16.png",
+        "32": "/images/icon32.png",
+        "48": "/images/icon48.png",
+        "60": "/images/icon60.png",
+        "90": "/images/icon90.png",
+        "120": "/images/icon120.png",
+        "128": "/images/icon128.png",
+        "256": "/images/icon256.png"
+    },
+    "developer": {
+        "name": "sandbox.lt",
+        "url": "http://sandbox.lt"
+    },
+    "installs_allowed_from": ["*"],
+    "default_locale": "en"
+}
