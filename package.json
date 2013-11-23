@@ -9,6 +9,7 @@
     "express": "3.4.4",
     "sqlite3": "2.x",
     "marked": "*",
-    "jade": "*"
+    "jade": "*",
+    "express-persona": "*"
   }
 }
