@@ -151,6 +151,10 @@ function loadEntries() {
       for (var i = 0; i < entries.length; i++) {
         $('#entries').append(createEntryBox(entries[i], null));
       }
+      if (entries.length > 0) {
+        g_last_entry_date = entries[entries.length-1].date;
+        console.log(g_last_entry_date);
+      }
     },
     error: function() {
     }
@@ -234,3 +238,17 @@ function delete_entry(entry_id) {
   }
 }
 
+function getDocHeight() {
+  var D = document;
+  return Math.max(
+      Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+      Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+      Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+      );
+}
+
+$(window).scroll(function() {
+  if($(window).scrollTop() + $(window).height()+20 >= getDocHeight()) {
+    loadEntries();
+  }
+});
