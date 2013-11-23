@@ -79,7 +79,7 @@ exports.modify = function(req, res){
     return;
   }
 
-  db.db.get("SELECT email FROM entries WHERE id = ?", [req.params.id],
+  db.db.get("SELECT id, email, datetime(entries.date, 'unixepoch') as fdate FROM entries WHERE id = ?", [req.params.id],
       function (err, row) {
         if (err) {
           console.log('ERROR: entries.modify.check_email');
@@ -102,7 +102,13 @@ exports.modify = function(req, res){
               res.json({'message': 'Server side failure..'}, 500)
             }
             else {
-              res.json({'message': 'entry modified'}, 200);
+              var md5sum = crypto.createHash('md5');
+              md5sum.update(req.session.email);
+              var md5 = md5sum.digest('hex');
+
+              res.json({'message': 'entry modified', 'id': row.id,
+                'email': req.session.email, 'md5': md5, 'text_rendered': text_rendered,
+                'fdate': row.fdate}, 200);
             }
           });
       });

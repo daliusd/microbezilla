@@ -26,6 +26,7 @@ $(document).ready(function() {
           showNewEntryForm();
           console.log("You have been logged in as: " + data.email);
         }
+        loadEntries();
       }, false);
 
       xhr.send(JSON.stringify({
@@ -40,6 +41,7 @@ $(document).ready(function() {
         $('#logout').hide();
         g_user = '';
         hideNewEntryForm();
+        loadEntries();
         console.log("You have been logged out");
       });
       xhr.send();
@@ -47,7 +49,6 @@ $(document).ready(function() {
   });
 
   g_last_entry_date = Math.floor(Date.now()) / 1000;
-  loadEntries();
 })
 
 function showNewEntryForm() {
@@ -75,7 +76,7 @@ function showNewEntryForm() {
             $("#message").text('Preview created.');
             $('#newpreview').remove();
             data['email'] = g_user.slice(0, g_user.indexOf('@'));
-            $('#newentryform').after(createEntryBox(data, true));
+            $('#newentryform').after(createEntryBox(data, 'newpreview'));
           },
           error: function() {
             $("#message").text('Preview failed.');
@@ -94,7 +95,8 @@ function showNewEntryForm() {
           success: function(data) {
             $("#message").text('Entry created.');
             $('#newpreview').remove();
-            $('#newentryform').after(createEntryBox(data, false));
+            data['fdate'] = (new Date()).toUTCString();
+            $('#newentryform').after(createEntryBox(data, null));
           },
           error: function() {
             $("#message").text('Failed to create entry.');
@@ -108,7 +110,7 @@ function createEntryBox(data, preview) {
 
   if (preview) {
     box.addClass('preview');
-    box.attr('id', 'newpreview');
+    box.attr('id', preview);
   }
   else {
     box.attr('id', 'entry'+data['id']);
@@ -117,8 +119,17 @@ function createEntryBox(data, preview) {
   var img = $('<img class="avatar"/>');
   img.attr('src', 'http://www.gravatar.com/avatar/' + data['md5'] + '?s=64');
   box.append(img);
-  box.append('<strong>'+data['email']+'</strong>:<br/>');
+  box.append('<strong>'+data['email']+'</strong> (' + (preview ? ' - ' : data.fdate) + '):<br/>');
   box.append(data['text_rendered']);
+
+  if (g_user == data.email) {
+    var actions = $("<p/>");
+    actions.append(' ');
+    actions.append($("<a/>").text('Edit').click(edit_entry(data.id)));
+    actions.append(' ');
+    actions.append($("<a/>").text('Delete').click(delete_entry(data.id)));
+    box.append(actions);
+  }
 
   return box;
 }
@@ -138,11 +149,88 @@ function loadEntries() {
     success: function(data) {
       var entries = data['entries'];
       for (var i = 0; i < entries.length; i++) {
-        $('#entries').append(createEntryBox(entries[i], false));
+        $('#entries').append(createEntryBox(entries[i], null));
       }
     },
     error: function() {
     }
   });
+}
+
+function edit_entry(entry_id) {
+  return function() {
+    $.ajax({
+      type: 'GET',
+      url: '/entries/' + entry_id,
+      cache: false,
+      success: function(data) {
+        var box = $("<div/>").addClass('box');
+        box.attr('id', 'entry_' + entry_id + '_box');
+        box.append($('<textarea placeholder="Text"/>').attr('id', 'entry_' + entry_id + '_text').val(data.text));
+        var preview_button = $('<button>Preview</button>');
+        box.append($(preview_button));
+        var update_button = $('<button>Update</button>');
+        box.append($(update_button));
+        box.append($('<div/>').attr('id', 'entry_' + entry_id + '_message'));
+        box.append($('<div/>').attr('id', 'entry_' + entry_id + '_preview'));
+        $("#entry"+entry_id).append(box);
+
+        preview_button.click(
+          function() {
+            $.ajax({
+              type: 'POST',
+              url: '/entries',
+              cache: false,
+              dataType: 'json',
+              data: {
+                'preview': true,
+                'text': $("#entry_" + entry_id + "_text").val()
+              },
+              success: function(data) {
+                $("#entry_" + entry_id + "_message").text('Preview created.');
+                $("#entry_" + entry_id + "_preview").remove();
+                data['email'] = g_user.slice(0, g_user.indexOf('@'));
+                $("#entry_" + entry_id + "_box").after(createEntryBox(data, "entry_" + entry_id + "_preview"));
+              },
+              error: function() {
+                $("#entry_" + entry_id + "_preview").remove();
+                $("#entry_" + entry_id + "_message").text('Preview failed.');
+              }
+            });
+          });
+
+        update_button.click(
+            function() {
+              $.ajax({
+                type: 'PUT',
+                url: '/entries/' + entry_id,
+                cache: false,
+                dataType: 'json',
+                data: {'text': $("#entry_" + entry_id + "_text").val()},
+                success: function(data) {
+                  $("#entry" + entry_id).replaceWith(createEntryBox(data, null));
+                },
+                error: function() {
+                  $("#entry_" + entry_id + "_message").text('Failed to update entry.');
+                }
+              });
+            });
+      },
+      error: {
+      }
+    });
+  }
+}
+
+function delete_entry(entry_id) {
+  return function() {
+    $.ajax({
+      type: 'DELETE',
+      url: '/entries/' + entry_id,
+      success: function(data) {
+        $("#entry" + entry_id).remove();
+      }
+    });
+  }
 }
 
