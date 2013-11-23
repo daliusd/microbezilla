@@ -31,3 +31,11 @@ input {
           box-shadow: 0 10px 6px -6px #777;
 }
 
+.preview {
+  background-image:url('/images/preview.png');
+}
+
+img.avatar {
+  float: left;
+  padding-right: 5px;
+}

@@ -5,5 +5,5 @@ var config = require('../config');
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: config.web.title, 'email': req.session.email });
+  res.render('index', { title: config.web.title });
 };
