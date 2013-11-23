@@ -1,5 +1,13 @@
 extends layout
 
 block content
+  div.box
+    p Experimental micro-blogging service to discuss Firefox and related things. You can read more here 
+      a(target='_blank', href="https://github.com/daliusd/microbezilla") github.com/daliusd/microbezilla
+      | . You can login using your persona credentials and write here something. You can use 
+      a(target='_blank', href='http://daringfireball.net/projects/markdown/syntax') markdown syntax
+      | .
+    button#login Login
+    button#logout Logout
   div#entries
   script(src="/javascripts/main.js")
