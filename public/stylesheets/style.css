@@ -1,8 +1,33 @@
 body {
-  padding: 50px;
+  background: #CCC;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
 }
+
+.container {
+    margin: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    max-width: 700px;
+}
+
+textarea {
+  width: 100%;
+}
+
+input {
+  width: 100%;
+}
+
+.box {
+  background:#FFF;
+  margin:40px auto;
+  padding: 1em;
+  -webkit-box-shadow: 0 10px 6px -6px #777;
+     -moz-box-shadow: 0 10px 6px -6px #777;
+          box-shadow: 0 10px 6px -6px #777;
+}
+

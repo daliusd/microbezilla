@@ -1,7 +1,20 @@
 doctype 5
 html
   head
+    meta(http-equiv="Content-type", content="text/html; charset=utf-8")
+    if noindex
+      meta(name="robots", content="noindex")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="author", content="Dalius Dobravolskas")
+
     title= title
+    link(rel="shortcut icon", type="image/x-icon", href="/images/favicon.png")
     link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src="/javascripts/zepto.min.js")
+
   body
-    block content
+    div(class="container")
+      h1
+        a(href="/") #{title}
+      block content
+
