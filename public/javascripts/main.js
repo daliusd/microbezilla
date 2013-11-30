@@ -1,5 +1,6 @@
 var g_last_entry_date;
 var g_user;
+var g_md5;
 
 $(document).ready(function() {
   $('#logout').hide();
@@ -23,10 +24,11 @@ $(document).ready(function() {
           $('#login').hide();
           $('#logout').show();
           g_user = data.email;
+          g_md5 = CryptoJS.MD5(g_user);
+          updateEntries();
           showNewEntryForm();
           console.log("You have been logged in as: " + data.email);
         }
-        loadEntries();
       }, false);
 
       xhr.send(JSON.stringify({
@@ -40,8 +42,9 @@ $(document).ready(function() {
         $('#login').show();
         $('#logout').hide();
         g_user = '';
+        g_md5 = '';
         hideNewEntryForm();
-        loadEntries();
+        updateEntries();
         console.log("You have been logged out");
       });
       xhr.send();
@@ -49,6 +52,7 @@ $(document).ready(function() {
   });
 
   g_last_entry_date = Math.floor(Date.now()) / 1000;
+  loadEntries();
 })
 
 function showNewEntryForm() {
@@ -105,6 +109,15 @@ function showNewEntryForm() {
       });
 }
 
+function createActions(id) {
+    var actions = $("<p class='actions'/>");
+    actions.append(' ');
+    actions.append($("<a/>").text('Edit').click(edit_entry(id)));
+    actions.append(' ');
+    actions.append($("<a/>").text('Delete').click(delete_entry(id)));
+    return actions;
+}
+
 function createEntryBox(data, preview) {
   var box = $('<div class="box"/>');
 
@@ -115,6 +128,8 @@ function createEntryBox(data, preview) {
   else {
     box.attr('id', 'entry'+data['id']);
   }
+  box.data('id', data['id']);
+  box.data('md5', data['md5']);
 
   var img = $('<img class="avatar"/>');
   img.attr('src', 'http://www.gravatar.com/avatar/' + data['md5'] + '?s=64');
@@ -122,13 +137,8 @@ function createEntryBox(data, preview) {
   box.append('<strong>'+data['email']+'</strong> (' + (preview ? ' - ' : data.fdate) + '):<br/>');
   box.append(data['text_rendered']);
 
-  if (g_user == data.email) {
-    var actions = $("<p/>");
-    actions.append(' ');
-    actions.append($("<a/>").text('Edit').click(edit_entry(data.id)));
-    actions.append(' ');
-    actions.append($("<a/>").text('Delete').click(delete_entry(data.id)));
-    box.append(actions);
+  if (g_md5 == data.md5) {
+    box.append(createActions(data.id));
   }
 
   return box;
@@ -159,6 +169,19 @@ function loadEntries() {
     error: function() {
     }
   });
+}
+
+function updateEntries() {
+  var entries = $('#entries > div.box');
+  for (var i = 0; i < entries.length; i++) {
+    var entry = $(entries[i]);
+    if (entry.data('md5') == g_md5) {
+      entry.append(createActions(entry.data('id')));
+    }
+    else {
+      entry.children('p.actions').remove();
+    }
+  }
 }
 
 function edit_entry(entry_id) {

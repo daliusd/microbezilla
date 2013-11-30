@@ -20,9 +20,7 @@ exports.index = function(req, res){
           var md5sum = crypto.createHash('md5');
           md5sum.update(rows[i].email);
           rows[i].md5 = md5sum.digest('hex');
-          if (rows[i].email != req.session.email) {
-            rows[i].email = rows[i].email.slice(0, rows[i].email.indexOf('@'));
-          }
+          rows[i].email = rows[i].email.slice(0, rows[i].email.indexOf('@'));
         }
         res.json({'entries': rows}, 200);
       });
@@ -67,7 +65,8 @@ exports.create = function(req, res){
             return;
           }
           else {
-            res.json({'id': this.lastID, 'email': req.session.email, 'md5': md5, 'text_rendered': text_rendered}, 201);
+            var email = req.session.email.slice(0, req.session.email.indexOf('@'));
+            res.json({'id': this.lastID, 'email': email, 'md5': md5, 'text_rendered': text_rendered}, 201);
           }
         });
   }
@@ -106,8 +105,10 @@ exports.modify = function(req, res){
               md5sum.update(req.session.email);
               var md5 = md5sum.digest('hex');
 
+              var email = req.session.email.slice(0, req.session.email.indexOf('@'));
+
               res.json({'message': 'entry modified', 'id': row.id,
-                'email': req.session.email, 'md5': md5, 'text_rendered': text_rendered,
+                'email': email, 'md5': md5, 'text_rendered': text_rendered,
                 'fdate': row.fdate}, 200);
             }
           });
