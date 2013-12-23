@@ -1,4 +1,5 @@
 var g_last_entry_date;
+var g_loading = false;
 var g_user;
 var g_md5;
 
@@ -150,6 +151,10 @@ function hideNewEntryForm() {
 }
 
 function loadEntries() {
+  if (g_loading)
+      return;
+  g_loading = true;
+
   $.ajax({
     type: 'GET',
     url: '/entries',
@@ -165,8 +170,10 @@ function loadEntries() {
         g_last_entry_date = entries[entries.length-1].date;
         console.log(g_last_entry_date);
       }
+        g_loading = false;
     },
     error: function() {
+        g_loading = false;
     }
   });
 }
